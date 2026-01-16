@@ -1,91 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
-
-<title>Slideshow Test 2</title>
-
+<title>Test Slideshow</title>
 <style>
-html, body {
+body {
   margin: 0;
-  padding: 0;
   background: black;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
 }
-
 img {
   width: 100vw;
   height: 100vh;
   object-fit: contain;
-  user-select: none;
-  -webkit-user-drag: none;
-  touch-action: none;
 }
 </style>
 </head>
 
 <body>
 
-<!-- show first image immediately -->
 <img id="slide" src="images/01.JPG">
 
 <script>
-/* -------- CONFIG -------- */
-
-const imagePaths = [
+const images = [
   "images/01.JPG",
   "images/02.JPG",
   "images/03.JPG",
   "images/04.JPG",
-  "images/05.JPG"
+  "images/05.JPG",
 ];
 
-// milliseconds per image
-let interval = 750;
-
-/* -------- STATE -------- */
-
-let images = [];
-let loaded = 0;
 let index = 0;
-let paused = false;
+let interval = 50;
 let timer;
+let paused = false;
 
 const slide = document.getElementById("slide");
 
-/* -------- PRELOAD (background) -------- */
-
-imagePaths.forEach((path, i) => {
-  const img = new Image();
-  img.src = path;
-  img.onload = () => {
-    loaded++;
-    if (loaded === imagePaths.length) {
-      startSlideshow();
-    }
-  };
-  images[i] = img;
-});
-
-/* -------- SLIDESHOW -------- */
-
-function startSlideshow() {
-  index = 0;
-
-  timer = setInterval(() => {
-    if (paused) return;
-
-    index = (index + 1) % images.length;
-    slide.src = images[index].src;
-  }, interval);
+function showNext() {
+  if (paused) return;
+  index = (index + 1) % images.length;
+  slide.src = images[index];
 }
 
-/* -------- INTERACTION (unified) -------- */
+timer = setInterval(showNext, interval);
 
+/* --- POINTER EVENTS (touch, mouse, TV, pen) --- */
 document.addEventListener("pointerdown", () => {
   paused = true;
 });
@@ -98,7 +57,7 @@ document.addEventListener("pointercancel", () => {
   paused = false;
 });
 
-// disable right-click / long press
+/* --- Prevent context menu / long press --- */
 document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
 
