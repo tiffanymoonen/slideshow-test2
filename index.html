@@ -21,43 +21,49 @@ img {
 <img id="slide" src="images/01.JPG">
 
 <script>
-const images = [
+const imagePaths = [
   "images/01.JPG",
   "images/02.JPG",
   "images/03.JPG",
   "images/04.JPG",
-  "images/05.JPG",
+  "images/05.JPG"
 ];
 
+let images = [];
+let loaded = 0;
 let index = 0;
 let interval = 50;
-let timer;
 let paused = false;
+let timer;
 
 const slide = document.getElementById("slide");
 
-function showNext() {
-  if (paused) return;
-  index = (index + 1) % images.length;
-  slide.src = images[index];
+/* preload all images */
+imagePaths.forEach((path, i) => {
+  const img = new Image();
+  img.src = path;
+  img.onload = () => {
+    loaded++;
+    if (loaded === imagePaths.length) {
+      start();
+    }
+  };
+  images[i] = img;
+});
+
+/* start slideshow only after preload */
+function start() {
+  timer = setInterval(() => {
+    if (paused) return;
+    index = (index + 1) % images.length;
+    slide.src = images[index].src;
+  }, interval);
 }
 
-timer = setInterval(showNext, interval);
-
-/* --- POINTER EVENTS (touch, mouse, TV, pen) --- */
-document.addEventListener("pointerdown", () => {
-  paused = true;
-});
-
-document.addEventListener("pointerup", () => {
-  paused = false;
-});
-
-document.addEventListener("pointercancel", () => {
-  paused = false;
-});
-
-/* --- Prevent context menu / long press --- */
+/* interaction */
+document.addEventListener("pointerdown", () => paused = true);
+document.addEventListener("pointerup", () => paused = false);
+document.addEventListener("pointercancel", () => paused = false);
 document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
 
